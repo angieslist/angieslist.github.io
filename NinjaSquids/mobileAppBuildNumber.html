@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+    <!--
+        Use URL parameter ?seconds=true in order to add seconds to the build number.
+    -->
+<head>
+    <!-- See http://momentjs.com and http://momentjs.com/timezone/
+    -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.16.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.9/moment-timezone-with-data-2010-2020.min.js"></script>
+</head>
+<body>
+
+<script>
+  // See http://stackoverflow.com/questions/979975/how-to-get-the-value-from-the-get-parameters
+  var queryParams = function () {
+  // This function is anonymous, is executed immediately and 
+  // the return value is assigned to QueryString!
+  var query_string = {};
+  var query = window.location.search.substring(1);
+  var vars = query.split("&");
+  for (var i=0;i<vars.length;i++) {
+    var pair = vars[i].split("=");
+        // If first entry with this name
+    if (typeof query_string[pair[0]] === "undefined") {
+      query_string[pair[0]] = decodeURIComponent(pair[1]);
+        // If second entry with this name
+    } else if (typeof query_string[pair[0]] === "string") {
+      var arr = [ query_string[pair[0]],decodeURIComponent(pair[1]) ];
+      query_string[pair[0]] = arr;
+        // If third or later entry with this name
+    } else {
+      query_string[pair[0]].push(decodeURIComponent(pair[1]));
+    }
+  } 
+  return query_string;
+}();
+</script>
+    
+<script>
+    // Build number format is: yyyymmddhhmm[ss]
+    // See https://angieslist.atlassian.net/wiki/pages/viewpage.action?pageId=176521260
+    
+    // Work in Eastern time zone so distributed team members can create build numbers.
+    var d = moment().tz("America/New_York").toDate();
+        
+    var year = d.getFullYear();
+    
+    // Returns a string.
+    function prependZeroIfNeeded(value) {
+        var retValue = "" + value;
+        if (value <= 9) {
+            retValue = "0" + value;
+        }
+        
+        return retValue;
+    }
+    
+    var month = prependZeroIfNeeded(d.getMonth() + 1); // getMonth returns 0...11 so add 1.
+    var day = prependZeroIfNeeded(d.getDate());
+    var hours = prependZeroIfNeeded(d.getHours());
+    var minutes = prependZeroIfNeeded(d.getMinutes());
+    
+    // Optional
+    var seconds = prependZeroIfNeeded(d.getSeconds());
+    var usingSecondsParamValue = queryParams["seconds"];
+    var usingSeconds = false;
+    
+    if (usingSecondsParamValue != undefined) {
+        usingSeconds = usingSecondsParamValue.toUpperCase() == "TRUE"
+    }
+    
+    document.write("Year = " + year);
+    document.write("; Month = " + month);
+    document.write("; Day = " + day);
+    document.write("; Hour = " + hours);
+    document.write("; Minute = " + minutes);
+    
+    if (usingSeconds) {
+        document.write("; Second = " + seconds);
+    }
+    
+</script>
+    
+<em style="font-weight:bold">
+    (Eastern US timezone)
+</em>
+    
+<br>
+<br>
+
+<script>
+    var buildNumber = year + month + day + hours + minutes;
+    if (usingSeconds) {
+        buildNumber += seconds;
+    }
+</script>
+    
+Build number: 
+<br>
+<span style="font-size:50pt">
+<script>
+    document.write(buildNumber);
+</script>
+</span>
+
+</body>
+</html>
+

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .submit {
+            width: 10em;  height: 4em;
+        }
+    </style>
+    <title>Pointing JIRA Tickets Without Having a Meeting</title>
+</head>
+<body>
+    <div id="demo">
+        <form>
+            <h1>
+                Number of points: <input type="text" id="points">
+                <input type="button" onclick="showShortURL()" class="submit" value="Submit">
+            </h1>
+        </form>
+
+        <h1>URL to hide your point estimate:</h1>
+        <h1><p id="url"></p></h1>
+    </div>
+    
+    <script>
+        // Some code derived from https://gist.github.com/gbl08ma/6115095
+        function showShortURL() {
+            // Clear out the field, so it will be more clear when the new URL has appeared.
+            document.getElementById("url").innerHTML = ""
+            
+            var number = document.getElementById("points").value;
+            
+            var xhttp = new XMLHttpRequest();
+            
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("url").innerHTML = this.responseText;
+                }
+            };
+
+            // Adding a random string to the end of the URL so that we force tny.im to generate a different URL each time-- otherwise, it's too smart, and recycles URL's.
+            var paramsForURLToShorten = "number=" + number + "%26random=" + Math.random();
+
+            var urlToShorten = "http://angieslist.github.io/NinjaSquids/points.html?" + 
+                paramsForURLToShorten;
+            var generateURL = "https://tny.im/yourls-api.php?action=shorturl&format=simple&url=";
+
+            xhttp.open("GET", generateURL + urlToShorten , true);
+            xhttp.send();
+        }
+    </script>
+
+</body>
+</html>
+
